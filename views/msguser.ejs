@@ -1,0 +1,80 @@
+<% include ./partials/header.ejs %>
+    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-5/6 bg-zinc-900 min-h-screen p-3">
+        <div class="flex items-center text-white justify-between pr-5" >
+            <img class="w-48 object-cover p-1" src="/images/logo.png" alt="">
+            <a href="/feed">
+                <i class=" text-2xl ri-close-line"></i>
+            </a>
+        </div>
+        <div class="w-full  bg-zinc-900  py-5">
+            <div class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 rounded-md">
+                <i class="text-white ri-search-line"></i>
+                <input class="inp ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text"
+                    placeholder="search username">
+            </div>
+        </div>
+        <div class="users">
+            <%  userprofiles.forEach(user=> { %>
+                <a href="/msg/<%= user.username %>">
+            <div class="flex items-center p-2 mb-1 space-x-4 text-white bg-zinc-800 w-full text-white rounded">
+                    <img src="/images/uploads/<%= user.profilepicture %>" alt="User" class="w-12 h-12 rounded-full">
+                    <div>
+                        <h1 class=""><%= user.username %></h1>
+                        <h3 class="opacity-30"><%= user.name %></h3>
+                    </div>
+            </div>
+                </a>
+            <% });%>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
+    integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    document.querySelector(".inp")
+        .addEventListener("input", function () {
+            var typed = this.value;
+            if (typed.length == 0) {
+                document.querySelector('.users')
+                .innerHTML = "";
+                document.querySelector('.users')
+                .innerHTML = `<%  userprofiles.forEach(user=> { %>
+                <a href="/msg/<%= user.username %>">
+            <div class="flex items-center p-2 mb-1 space-x-4 text-white bg-zinc-800 w-full text-white rounded">
+                    <img src="/images/uploads/<%= user.profilepicture %>" alt="User" class="w-12 h-12 rounded-full">
+                    <div>
+                        <h1 class=""><%= user.username %></h1>
+                        <h3 class="opacity-30"><%= user.name %></h3>
+                    </div>
+            </div>
+                </a>
+            <% });%>`;
+            }
+            if (typed.length > 0) {
+                axios.get(`/user/${typed}`)
+                .then(function (response) {
+                    var clutter = "";
+                    response.data.forEach(elem => {
+                        clutter += `<a href="/msg/${elem.username}" class="outline-none">
+                                        <div class="text-white flex items-center gap-2 mt-5 bg-zinc-800 p-3 rounded">
+                                            <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100 overflow-hidden">
+                                                <img class="image h-full w-full bg-cover"  src="/images/uploads/${elem.profilepicture}" alt="">
+                                            </div>
+                                            <div class="text">
+                                                <h3>${elem.username}</h3>
+                                                <h4 class="text-xs opacity-30 leading-none">${elem.name}</h4>
+                                            </div>
+                                        </div>
+                                    </a>`;
+                    });
+
+                document.querySelector('.users')
+                .innerHTML = "";
+                document.querySelector('.users')
+                .innerHTML = clutter;
+                }) 
+            }
+            
+        })
+</script>
+<% include ./partials/footer.ejs %>

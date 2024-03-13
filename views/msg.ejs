@@ -1,0 +1,150 @@
+<% include ./partials/header.ejs %>
+<div class="w-full md:w-3/4 lg:w-4/5 xl:w-5/6 bg-zinc-900 min-h-screen">
+    <div class="flex items-center space-x-4 p-3 text-white bg-zinc-800 justify-between" style="position: sticky; top: 0; z-index: 9;">
+        <div class="flex items-center space-x-4 w-full text-white">
+            <img src="/images/uploads/<%= chatuser.profilepicture %>" alt="User" class="w-12 h-12 rounded-full">
+            <div>
+                <h1><%= chatuser.username %></h1>
+                <h1 class="opacity-30"><%= chatuser.name %></h1>
+            </div>
+        </div>
+        <i class="ri-close-line"></i>
+    </div>
+
+    <!-- Main Content Body -->
+    <div class="p-2">
+        <!-- Message Container -->
+        <div class="chattingarea flex flex-col space-y-4 min-h-[76vh]">
+            <!-- Messages -->
+           
+            <!-- Add more messages here -->
+        </div>
+        <!-- Message Input -->
+        <div class="botton flex items-center mt-4" style="position: sticky; bottom: 5px;">
+            <input type="text" placeholder="Type your message..."
+                class="w-full px-4 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-200 rounded focus:outline-none focus:border-blue-500">
+            <button onclick="sendMsg()"
+                class="sendbtn px-4 py-2 ml-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                Send
+            </button>
+        </div>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    
+    var socket = io();
+    socket.emit('join-server', {
+        username: '<%= user.username %>'
+    })
+    socket.emit('fetch-conversation', {
+        sender: '<%= user.username %>',
+        receiver: '<%= chatuser.username %>'
+    })
+</script>
+<script>
+    document.querySelector(".botton input").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            sendMsg();
+        }
+    });
+
+    let sender = '<%= user.username %>';
+    let receiver = '<%= chatuser.username %>';
+
+    function putincomingpost(post) {
+        const template = `
+        <div class="flex gap-2 w-60 ">
+            <img src="/images/uploads/<%= chatuser.profilepicture %>" alt="User" class="w-8 h-8 rounded-full">
+            <div class="w-full bg-zinc-600 p-1 rounded" style="margin-left: auto;">
+                <div class="flex items-center gap-2">
+                <img src="/images/uploads/${post.user.profilepicture}" alt="User" class="w-10 h-10 rounded-full">
+                <div>
+                <h4 class="text-white ">${post.user.username}</h4>
+                <h4 class="text-white opacity-30">${post.user.name}</h4>
+                </div>
+                </div>
+                <img class="mt-2" src="/images/uploads/${post.image}" alt="User" class="w-full h-46">
+        </div>
+        </div>`;
+        document.querySelector(".chattingarea").innerHTML += template;
+    }
+
+    function putincomingmsg(msg) {
+        const template = `
+        <div class="flex items-start space-x-4  ">
+            <img src="/images/uploads/<%= chatuser.profilepicture %>" alt="User" class="w-8 h-8 rounded-full">
+            <div class="p-1 px-3 bg-blue-100 text-white bg-zinc-600 rounded-full">
+                <p>${msg}</p>
+            </div>
+        </div>`;
+        document.querySelector(".chattingarea").innerHTML += template;
+    }
+
+    function outgoingpost(post) {
+        const template = `
+        <div class="w-1/2 bg-blue-600 p-1 rounded" style="margin-left: auto;">
+                <div class="flex items-center gap-2">
+                <img src="/images/uploads/${post.user.profilepicture}" alt="User" class="w-10 h-10 rounded-full">
+                <div>
+                <h4 class="text-white ">${post.user.username}</h4>
+                <h4 class="text-white opacity-70">${post.user.name}</h4>
+                </div>
+                </div>
+                <img class="mt-2" src="/images/uploads/${post.image}" alt="User" class="w-full h-46">
+        </div>`;
+        document.querySelector('.chattingarea').innerHTML += template;
+    }
+
+    function outgoingmsg(msg) {
+        const template = `
+        <div class="flex items-start space-x-4" style="margin-left: auto;">
+            <div class="p-1 px-3 bg-blue-100 text-white bg-blue-600 rounded-full">
+                <p>${msg}</p>
+            </div>
+        </div>`;
+        document.querySelector('.chattingarea').innerHTML += template;
+    }
+
+    function sendMsg() {
+        const msgInput = document.querySelector('.botton input');
+        const msg = msgInput.value.trim(); // Trim to remove leading/trailing whitespace
+
+        if (msg) { // Check if msg is not empty
+            outgoingmsg(msg);
+            msgInput.value = "";
+            socket.emit('private-msg', {
+                msg,
+                sender,
+                receiver
+            });
+        } else {
+            console.log("Message is empty.");
+        }
+    }
+    
+
+    socket.on('receive-private-msg', msgobj => {
+        putincomingmsg(msgobj.msg);
+    });
+
+    socket.on('send-conversation', allmsg => {
+        allmsg.forEach(msg => {
+            if (sender === msg.sender) {
+                if (msg.post) {
+                    outgoingpost(msg.post);
+                } else {
+                    outgoingmsg(msg.message);
+                }
+            } else {
+                if (msg.post) {
+                    putincomingpost(msg.post);
+                } else {
+                    putincomingmsg(msg.message);
+                }
+            }
+        });
+    });
+
+</script>
+<% include ./partials/footer.ejs %>

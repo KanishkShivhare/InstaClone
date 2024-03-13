@@ -1,0 +1,267 @@
+<% include ./partials/header.ejs %>
+  <div class="min-h-screen bg-zinc-900 text-white py-5">
+    <div class="share w-full bg-zinc-900  hidden"
+      style="top: 30%; position: fixed; z-index: 99; height: 70%; border-radius: 10px;">
+        <div class="w-full flex justify-between" style="border-bottom: 1px solid wheat; align-items: center;">
+          <i style="padding: 3px; font-size:25px;" class="ri-arrow-left-circle-fill"></i>
+          <h1 class="shareheadline mt-2 py-2" style="width: 61%;"> Comments</h1>
+        </div>
+        <div class="shareOption">
+
+        </div>
+    </div>
+    <div class="commentpage w-full bg-zinc-900  hidden"
+      style="top: 30%; position: fixed; z-index: 99; height: 70%; border-radius: 10px;">
+      <div class="w-full flex justify-between" style="border-bottom: 1px solid wheat; align-items: center;">
+        <i style="padding: 3px; font-size:25px;" class="ri-arrow-left-circle-fill"></i>
+        <h1 class="mt-2 py-2" style="width: 61%;"> Comments</h1>
+      </div>
+
+      <div class="Send" style="position: fixed; bottom: 0%;">
+        <input style="margin: 10px; border-radius: 5px; padding: 10px 40px;" type="text" class="form-control"
+          placeholder="Enter Comment">
+        <button style="background-color: rgb(7, 141, 178); padding: 10px 12px; border-radius: 10px;"
+          class=" btn btn-success ">Send</button>
+      </div>
+    </div>
+    <div class="w-full px-4 flex items-center justify-between">
+      <img class="w-1/4" src="/images/logo.png" alt="">
+      <div class="icons -mt-2 flex gap-5 items-center">
+        <i class="text-[1.4rem] ri-heart-3-line"></i>
+        <a href="/msguser"><i class="text-[1.4rem] ri-messenger-line"></i></a>
+      </div>
+    </div>
+    <div class="story px-3 flex gap-3 overflow-auto mt-3 ">
+      <a href="/story/0">
+        <div class="circle flex-shrink-0 f">
+          <div
+            class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+            <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden ">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profilepicture %>" alt="">
+            </div>
+          </div>
+          <h1 class="flex justify-center text-sm text-white opacity-30">your story</h1>
+        </div>
+      </a>
+      <% stories.forEach(function(storyuser){%>
+        <a href="/story/<%= storyuser.user._id %>/0">
+          <div class="circle flex-shrink-0">
+            <div
+              class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+              <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden">
+                <img class="w-full h-full object-cover" src="/images/uploads/<%= storyuser.user.profilepicture %>"
+                  alt="">
+              </div>
+            </div>
+            <h1 class="text-sm flex justify-center text-white opacity-50">
+              <%= storyuser.user.username %>
+            </h1>
+          </div>
+        </a>
+        <% }) %>
+
+    </div>
+    <div class="posts mb-20">
+      <% posts.reverse().forEach(post=> { %>
+        <div class="post relative mt-5 w-full min-h-[50vh]">
+          <div class="title px-4 flex items-center gap-2">
+            <div class="w-[8vw] h-[8vw] bg-sky-100 rounded-full overflow-hidden">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.user.profilepicture %>" alt="">
+            </div>
+            <h4 class="text-sm">
+              <a href="/userprofile/<%= post.user.username %>">
+                <%= post.user.username %>
+              </a>
+            </h4>
+            <h6 class="text-xs opacity-30">1d</h6>
+          </div>
+          <div class="w-full h-96 mt-4 bg-sky-100">
+            <img data-id="<%= post._id %>"
+              class="postImg <%= post.likes.indexOf(user._id) === -1 ? 'unlike' : 'liked' %> w-full h-full object-cover"
+              src="/images/uploads/<%= post.image %>" alt="">
+          </div>
+          <div class="options w-full px-4 flex justify-between items-center text-[1.4rem]">
+            <div class="flex gap-3 mt-2">
+              <i data-id="<%= post._id %>"
+                class="like <%= post.likes.indexOf(user._id) === -1 ? 'ri-heart-3-line' : 'text-red-500 ri-heart-3-fill' %>"></i>
+              <i class="comment ri-chat-3-line"></i>
+              <i data-id="<%= post._id %>" class="ri-share-circle-line"></i>
+
+            </div>
+            <i data-id="<%= post._id %>"
+              class="save <%= user.saved.indexOf(post._id) === -1 ? 'ri-bookmark-line' : 'ri-bookmark-fill' %>"></i>
+          </div>
+          <h3 class="likes px-4 mt-2 text-sm leading-none tracking-tight">
+            <%= post.likes.length %> likes
+          </h3>
+          <h2 class="text-white font-light text-sm mt-2"><span class="font-semibold pl-4 pr-2">
+              <%= post.user.username %>
+            </span>
+            <%= post.caption %>
+          </h2>
+        </div>
+        <% });%>
+    </div>
+
+  </div>
+  <% include ./partials/footer.ejs %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
+      integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+      integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      var msgpost = null;
+      var sender = null;
+      var receiver = null;
+
+      function handlelike() {
+        document.querySelector(".posts").addEventListener("click", function (ev) {
+          var icon = ev.target;
+          if (ev.target.classList.contains('like')) {
+            axios(`/like${ev.target.dataset.id}`)
+              .then(function (res) {
+                if (icon.classList.contains('ri-heart-3-line')) {
+                  icon.classList.add('ri-heart-3-fill', 'text-red-500')
+                  icon.classList.remove('ri-heart-3-line')
+                } else {
+                  icon.classList.remove('ri-heart-3-fill', 'text-red-500')
+                  icon.classList.add('ri-heart-3-line')
+                }
+                icon.parentNode.parentNode.parentNode.querySelector('.likes').textContent = res.data.likes.length + 'likes';
+              })
+          }
+        })
+      }
+      function makeHeartAnimation() {
+        document.querySelector(".posts").addEventListener("click", function (ev) {
+
+          if (ev.target.classList.contains('postImg')) {
+            var i = document.createElement('i');
+            i.classList.add('ri-heart-3-fill', 'text-red-500', 'text-5xl', 'z-[34]', 'absolute', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2')
+            ev.target.parentNode.appendChild(i);
+            // console.log(ev.target.parentNode.parentNode.querySelector(".like"));
+            if (ev.target.parentNode.parentNode.querySelector(".like").classList.contains('ri-heart-3-line')) {
+              axios(`/like${ev.target.dataset.id}`).then(function (res) {
+                ev.target.parentNode.parentNode.querySelector(".like").classList.add('ri-heart-3-fill', 'text-red-500')
+                ev.target.parentNode.parentNode.querySelector(".like").classList.remove('ri-heart-3-line')
+                ev.target.parentNode.parentNode.querySelector(".likes").textContent = res.data.likes.length + 'likes';
+              })
+            }
+            gsap.from(i, {
+              y: 20,
+              opacity: 0,
+              ease: 'linear',
+              onComplete: function () {
+                // gsap.to(i, {
+                //   y: -20,
+                //   opacity: 0,
+                //   ease: 'linear',
+                // })
+                ev.target.parentNode.removeChild(i);
+              }
+            })
+          }
+        })
+      }
+
+      function handlesave() {
+        document.querySelector(".posts").addEventListener("click", function (ev) {
+          if (ev.target.classList.contains("save")) {
+            axios(`/save/${ev.target.dataset.id}`).then(function (res) {
+              // console.log(ev.target.classList.contains('ri-bookmark-line'));
+              if (ev.target.classList.contains('ri-bookmark-line')) {
+                // console.log("heyy");
+                ev.target.classList.add('ri-bookmark-fill')
+                ev.target.classList.remove('ri-bookmark-line')
+              } else {
+                ev.target.classList.remove('ri-bookmark-fill')
+                ev.target.classList.add('ri-bookmark-line')
+              }
+            })
+
+          }
+        })
+      }
+      function comment() {
+        document.querySelector(".posts").addEventListener("click", function (ev) {
+          if (ev.target.classList.contains("comment")) {
+            ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage").classList.remove('hidden')
+            //  console.log(ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage"));
+          }
+        })
+        document.querySelector(".commentpage").addEventListener("click", function (ev) {
+          if (ev.target.classList.contains("ri-arrow-left-circle-fill")) {
+            ev.target.parentNode.parentNode.classList.add('hidden')
+            //  console.log(ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage"));
+          }
+        })
+      }
+      function share() {
+        document.querySelector(".posts").addEventListener('click', (ev) => {
+          if (ev.target.classList.contains("ri-share-circle-line")) {
+            msgpost = ev.target.dataset.id;
+            sender = `<%= user.username%>`
+
+
+            ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".share").classList.remove('hidden')
+            
+            
+            ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".shareheadline").textContent = "Share Post"
+            // document.querySelector('.share',(ev)=>{
+            //   if (ev.target.querySelector('.ri-arrow-left-circle-fill')) {
+            //     console.log('hieee');
+            //   }
+            // })
+            axios.get('/share')
+              .then(function (response) {
+                var clutter = "";
+                response.data.forEach(user => {
+                  clutter += ` <div class="postshare flex items-center justify-between p-2 mb-1 space-x-4 text-white bg-zinc-800 w-full text-white rounded">
+                    <div class="flex items-center p-2 gap-2">
+                      <img src="/images/uploads/${user.profilepicture} " alt="User" class="w-12 h-12 rounded-full">
+                      <div>
+                        <h1 data-id="${user.username}" class="postsharename">${user.username}</h1>
+                        <h3 class="opacity-30">${user.name}</h3>
+                      </div>
+                    </div>
+                    <button class="sendbtn px-4 py-2 ml-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-zinc-800">
+                    Send
+                </button>
+                  </div>`
+                });
+                
+                ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".shareOption").innerHTML = clutter;
+              })
+          }
+        })
+      }
+      document.addEventListener("click", function (ev) {
+        if (ev.target.classList.contains("sendbtn")) {
+          const postshare = ev.target.closest(".postshare");
+          if (postshare) {
+            const postsharename = postshare.querySelector(".postsharename");
+            if (postsharename) {
+              const receiver = postsharename.dataset.id;
+              postsend(receiver); // Call postsend function with receiver argument
+            }
+          }
+        }
+      });
+
+      function postsend(receiver) {
+        if (receiver != null) {
+          socket.emit('private-msg', { msgpost, sender, receiver });
+        }
+      }
+
+      // postsend();
+      share();
+      comment();
+      handlesave();
+      handlelike();
+      makeHeartAnimation();
+    </script>
