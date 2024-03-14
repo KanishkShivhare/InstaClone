@@ -4,7 +4,7 @@
         <h3 class="text-lg"><%= user.username %></h3>
         <div class="icons flex gap-5">
           <a href="/upload"><i class="text-[1.4rem] ri-add-box-line"></i></a>
-          <i class="text-[1.4rem] ri-menu-line"></i>
+          <i class="text-[1.4rem] ri-menu-line" id="menu-icon"></i>
         </div>
       </div>
       <div class="flex justify-between items-center pl-6 pr-[12vw] mt-8">
@@ -48,5 +48,30 @@
        
       </div>
   </div>
+
+  <div class="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-300 hidden" id="dropdown-menu" style="z-index: 999;">
+    <a href="/follower" class="block py-2">Followers</a>
+    <a href="/following" class="block py-2">Following</a>
+    <a href="/save" class="block py-2">Save</a>
+    <a href="/edit" class="block py-2">Edit Profile</a>
+  </div>
   
 <% include ./partials/footer.ejs %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const menuIcon = document.getElementById("menu-icon");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+
+    menuIcon.addEventListener("click", function() {
+      gsap.to(dropdownMenu, { duration: 0.5, y: 0, ease: "power2.out" });
+      dropdownMenu.classList.remove("hidden");
+      document.addEventListener("click", function(event) {
+        if (!dropdownMenu.contains(event.target) && event.target !== menuIcon) {
+          dropdownMenu.classList.add("hidden");
+        }
+      });
+    });
+  });
+
+</script>

@@ -3,16 +3,40 @@ var router = express.Router();
 const userModel = require("./users");
 const postModel = require("./post");
 const storyModel = require("./story");
+const commentModel = require("./comment");
 const passport = require("passport");
 var localStrategy = require("passport-local");
 const upload = require("./multer");
 const fs = require("fs");
 const { log } = require("console");
+const comment = require("./comment");
 
 passport.use(new localStrategy(userModel.authenticate()));
 
 router.get("/", function (req, res) {
   res.render("index", { footer: false });
+});
+router.get("/comments/:receiver", isloggedIn,async function (req, res) {
+  const comments = await commentModel.find({
+    receiver: req.params.receiver,
+  }).populate("sender")
+  res.json(comments);
+});
+router.post("/comment/:comment/:receiver",isloggedIn,async function (req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user,
+  });
+  // const comments = await commentModel.find().populate("user");
+  const comment = await commentModel.create({
+    sender: user._id,
+    receiver: req.params.receiver,
+    comment: req.params.comment
+  })
+  // console.log(comment.comment);
+  const post = await postModel.findOne({
+    _id:req.params.receiver
+  })
+  
 });
 router.get("/share",isloggedIn ,async function (req, res) {
   const users = await userModel.find({username:{$ne:req.session.passport.user}})

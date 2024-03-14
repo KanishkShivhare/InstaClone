@@ -2,26 +2,31 @@
   <div class="min-h-screen bg-zinc-900 text-white py-5">
     <div class="share w-full bg-zinc-900  hidden"
       style="top: 30%; position: fixed; z-index: 99; height: 70%; border-radius: 10px;">
-        <div class="w-full flex justify-between" style="border-bottom: 1px solid wheat; align-items: center;">
-          <i style="padding: 3px; font-size:25px;" class="ri-arrow-left-circle-fill"></i>
-          <h1 class="shareheadline mt-2 py-2" style="width: 61%;"> Comments</h1>
-        </div>
-        <div class="shareOption">
+      <div class="w-full flex justify-between" style="border-bottom: 1px solid wheat; align-items: center;">
+        <i style="padding: 3px; font-size:25px;" class="ri-arrow-left-circle-fill"></i>
+        <h1 class="shareheadline mt-2 py-2" style="width: 61%;"> Comments</h1>
+      </div>
+      <div class="shareOption">
 
-        </div>
+      </div>
     </div>
+   
     <div class="commentpage w-full bg-zinc-900  hidden"
       style="top: 30%; position: fixed; z-index: 99; height: 70%; border-radius: 10px;">
       <div class="w-full flex justify-between" style="border-bottom: 1px solid wheat; align-items: center;">
         <i style="padding: 3px; font-size:25px;" class="ri-arrow-left-circle-fill"></i>
         <h1 class="mt-2 py-2" style="width: 61%;"> Comments</h1>
       </div>
+      <div class="commentbox">
+
+      </div>
+     
 
       <div class="Send" style="position: fixed; bottom: 0%;">
-        <input style="margin: 10px; border-radius: 5px; padding: 10px 40px;" type="text" class="form-control"
+        <input style="margin: 10px; border-radius: 5px; padding: 10px 40px; color: black;" type="text" class="form-control"
           placeholder="Enter Comment">
-        <button style="background-color: rgb(7, 141, 178); padding: 10px 12px; border-radius: 10px;"
-          class=" btn btn-success ">Send</button>
+        <button onclick="sendMsg()" style="background-color: rgb(7, 141, 178); padding: 10px 12px; border-radius: 10px;"
+          class="">Send</button>
       </div>
     </div>
     <div class="w-full px-4 flex items-center justify-between">
@@ -84,7 +89,7 @@
             <div class="flex gap-3 mt-2">
               <i data-id="<%= post._id %>"
                 class="like <%= post.likes.indexOf(user._id) === -1 ? 'ri-heart-3-line' : 'text-red-500 ri-heart-3-fill' %>"></i>
-              <i class="comment ri-chat-3-line"></i>
+              <i data-id="<%= post._id %>"class="comment ri-chat-3-line"></i>
               <i data-id="<%= post._id %>" class="ri-share-circle-line"></i>
 
             </div>
@@ -117,6 +122,7 @@
       var msgpost = null;
       var sender = null;
       var receiver = null;
+      var commentreceiver = null;
 
       function handlelike() {
         document.querySelector(".posts").addEventListener("click", function (ev) {
@@ -167,7 +173,6 @@
           }
         })
       }
-
       function handlesave() {
         document.querySelector(".posts").addEventListener("click", function (ev) {
           if (ev.target.classList.contains("save")) {
@@ -186,60 +191,45 @@
           }
         })
       }
-      function comment() {
-        document.querySelector(".posts").addEventListener("click", function (ev) {
-          if (ev.target.classList.contains("comment")) {
-            ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage").classList.remove('hidden')
-            //  console.log(ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage"));
-          }
-        })
-        document.querySelector(".commentpage").addEventListener("click", function (ev) {
-          if (ev.target.classList.contains("ri-arrow-left-circle-fill")) {
-            ev.target.parentNode.parentNode.classList.add('hidden')
-            //  console.log(ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage"));
-          }
-        })
-      }
       function share() {
         document.querySelector(".posts").addEventListener('click', (ev) => {
           if (ev.target.classList.contains("ri-share-circle-line")) {
             msgpost = ev.target.dataset.id;
             sender = `<%= user.username%>`
-
-
+            
             ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".share").classList.remove('hidden')
-            
-            
             ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".shareheadline").textContent = "Share Post"
-            // document.querySelector('.share',(ev)=>{
-            //   if (ev.target.querySelector('.ri-arrow-left-circle-fill')) {
-            //     console.log('hieee');
-            //   }
-            // })
+            
             axios.get('/share')
               .then(function (response) {
                 var clutter = "";
                 response.data.forEach(user => {
                   clutter += ` <div class="postshare flex items-center justify-between p-2 mb-1 space-x-4 text-white bg-zinc-800 w-full text-white rounded">
                     <div class="flex items-center p-2 gap-2">
-                      <img src="/images/uploads/${user.profilepicture} " alt="User" class="w-12 h-12 rounded-full">
+                      <img src="/images/uploads/${user.profilepicture} " alt="User" class="w-8 h-8 rounded-full">
                       <div>
                         <h1 data-id="${user.username}" class="postsharename">${user.username}</h1>
                         <h3 class="opacity-30">${user.name}</h3>
-                      </div>
-                    </div>
-                    <button class="sendbtn px-4 py-2 ml-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-zinc-800">
-                    Send
-                </button>
+                        </div>
+                        </div>
+                        <button class="sendbtn px-4 py-2 ml-2 text-sm font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-zinc-800">
+                          Send
+                          </button>
                   </div>`
                 });
                 
                 ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".shareOption").innerHTML = clutter;
               })
+              document.addEventListener("click", (ev) => {
+              if (ev.target.classList.contains("ri-arrow-left-circle-fill")) {
+                ev.target.parentNode.parentNode.classList.add('hidden')
+              }
+            })
           }
         })
       }
-      document.addEventListener("click", function (ev) {
+      function postshare() {
+        document.addEventListener("click", function (ev) {
         if (ev.target.classList.contains("sendbtn")) {
           const postshare = ev.target.closest(".postshare");
           if (postshare) {
@@ -251,14 +241,81 @@
           }
         }
       });
-
+      }
       function postsend(receiver) {
         if (receiver != null) {
           socket.emit('private-msg', { msgpost, sender, receiver });
         }
       }
+      
+      function comment() {
+        document.querySelector(".posts").addEventListener("click", function (ev) {
+          if (ev.target.classList.contains("comment")) {
+            commentreceiver = ev.target.dataset.id,
+            ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage").classList.remove('hidden')
+            //  console.log(ev.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector(".commentpage"));
+            axios.get(`/comments/${commentreceiver}`)
+            .then(function (response) {
+                    var clutter = "";
+                    response.data.forEach(elem => {
+                        clutter += ` <div class=" p-2 flex gap-2 bg-zinc-800 rounded-lg mt-2 mx-1 space-x-4">
+                                <img src="/images/uploads/${elem.sender.profilepicture} " alt="User" class="w-8 h-8 rounded-full">
+                                <div class="min-w-full ">
+                                  <h1 class="font-bold"">${elem.sender.username}</h1>
+                                  <p class="opacity-70">${elem.comment}</p>
+                                  </div>
+                                  </div>
+                                    `;
+                    });
+                document.querySelector('.commentbox')
+                .innerHTML = clutter;
+                }) 
+                document.querySelector(".Send input").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendMsg();
+        }
+    });
+            
+          }
+        })
+        document.querySelector(".commentpage").addEventListener("click", function (ev) {
+          if (ev.target.classList.contains("ri-arrow-left-circle-fill")) {
+            ev.target.parentNode.parentNode.classList.add('hidden')
+            
+          }
+        })
 
-      // postsend();
+      }
+     
+      
+      function commentbox(msg) {
+        const template = `
+        <div class=" p-2 flex gap-2 bg-zinc-800 rounded-lg mt-2 mx-1 space-x-4">
+          <img src="/images/uploads/<%=user.profilepicture%> " alt="User" class="w-8 h-8 rounded-full">
+          <div class="min-w-full ">
+            <h1 class="font-bold""><%=user.username%></h1>
+            <p class="opacity-70">${msg}</p>
+            </div>
+            </div>
+            `
+            document.querySelector('.commentbox').innerHTML += template;
+          }
+      function sendMsg() {
+            const msgInput = document.querySelector('.Send input');
+            const msg = msgInput.value.trim(); // Trim to remove leading/trailing whitespace
+            if (msg) { // Check if msg is not empty
+              axios.post(`/comment/${msg}/${commentreceiver}`)
+              commentbox(msg);
+                msgInput.value = "";
+               
+            } else {
+                console.log("Message is empty.");
+            }
+        }
+
+
+
+      postshare() 
       share();
       comment();
       handlesave();
