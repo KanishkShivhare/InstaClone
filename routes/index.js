@@ -16,6 +16,32 @@ passport.use(new localStrategy(userModel.authenticate()));
 router.get("/", function (req, res) {
   res.render("index", { footer: false });
 });
+router.get("/followers",isloggedIn,async function (req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user
+  }).populate("followers")
+  res.render("followers", { footer: true ,user });
+});
+router.get("/following",isloggedIn,async function (req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user
+  }).populate("following")
+  res.render("following", { footer: true ,user });
+});
+router.get("/save", isloggedIn, async function(req, res) {
+  try {
+    const user = await userModel.findOne({
+      username: req.session.passport.user
+    }).populate({ path: 'saved', populate: { path: 'user' } });
+    // console.log(user.saved);
+    res.render("save", { user: user, footer: true }); // Pass user object as a key-value pair
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 router.get("/comments/:receiver", isloggedIn,async function (req, res) {
   const comments = await commentModel.find({
     receiver: req.params.receiver,
