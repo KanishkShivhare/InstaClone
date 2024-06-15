@@ -3,7 +3,7 @@ const { stringify } = require("uuid");
 
 const plm = require("passport-local-mongoose");
 
-mongoose.connect(`mongodb://127.0.0.1:27017/instagramApp`);
+mongoose.connect(`mongodb+srv://kanishk:kanishkmern@cluster0.99v5rcb.mongodb.net/instagramApp?retryWrites=true&w=majority&appName=Cluster0`);
 
 const userSchema = mongoose.Schema({
   username: String,
