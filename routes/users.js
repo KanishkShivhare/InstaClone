@@ -52,7 +52,7 @@ const userSchema = mongoose.Schema({
   socketId: {
     type: String,
   },
-});
+},{autoIndex: false});
 
 mongoose.plugin(plm);
 
